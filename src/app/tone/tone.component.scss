@@ -1,0 +1,51 @@
+.tone {
+    width: 24px;
+    height: 24px;
+    line-height: 20px;
+    margin: 0 auto;
+    font-size: 0.8em;
+    text-align: center;
+    padding: 2px;
+    border-radius: 50%;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #333333;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+    opacity: 0.05;
+    cursor: default;
+
+    &.visible {
+        opacity: 1;
+    }
+
+    .tooltip {
+        position: absolute;
+        bottom: 30px;
+        padding: 5px 8px;
+        color: #333;
+        background: #eee;
+        border-radius: 2px;
+        border: 1px solid #999;
+        display: none;
+    }
+
+    &:hover .tooltip {
+        display: block;
+    }
+}
+
+.tone:hover {
+    opacity: 1;
+}
+
+:host-context(.small-width) {
+    .tone {
+        width: 16px;
+        height: 16px;
+        font-size: 0.6em;
+        line-height: 14px;
+        padding: 1px;
+    }
+}

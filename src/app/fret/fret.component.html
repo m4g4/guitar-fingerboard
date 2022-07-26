@@ -1,0 +1,38 @@
+<div [ngClass]="['fret', fretNumber === 0 ? 'zero' : '']">
+  <app-fret-string
+    [isZeroFret]="fretNumber === 0"
+    [displayData]="displayData(1, 'E')"
+    stringLook="sizeOne silver">
+  </app-fret-string>
+  <app-fret-string
+    [isZeroFret]="fretNumber === 0"
+    [displayData]="displayData(2, 'B')"
+    stringLook="sizeOne silver">
+  </app-fret-string>
+  <app-fret-string
+    [isZeroFret]="fretNumber === 0"
+    [displayData]="displayData(3, 'G')"
+    stringLook="sizeOne copper">
+  </app-fret-string>
+  <app-fret-string
+    [isZeroFret]="fretNumber === 0"
+    [displayData]="displayData(4, 'D')"
+    stringLook="sizeTwo copper">
+  </app-fret-string>
+  <app-fret-string
+    [isZeroFret]="fretNumber === 0"
+    [displayData]="displayData(5, 'A')"
+    stringLook="sizeTwo copper">
+  </app-fret-string>
+  <app-fret-string
+    [isZeroFret]="fretNumber === 0"
+    [displayData]="displayData(6, 'E')"
+    stringLook="sizeThree copper">
+  </app-fret-string>
+
+  <div *ngIf="shouldDisplayDot()" class="fretboard-dot"><div></div></div>
+  <div *ngIf="shouldDisplayDoubleDot()" class="fretboard-dot twelfth"><div></div><div></div></div>
+</div>
+
+<div *ngIf="shouldDisplayDot()" class="side-dot"><div></div></div>
+<div *ngIf="shouldDisplayDoubleDot()" class="side-dot"><div></div><div></div></div>

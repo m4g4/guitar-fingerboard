@@ -1,0 +1,6 @@
+<div [ngClass]="['tone', visible ? 'visible' : '']"
+     (mouseover)="mouseOver()"
+     (mouseout)="mouseOut()">
+    {{toneDisplayedString}}
+    <div *ngIf="tooltip" class="tooltip">{{tooltip}}</div>
+</div>

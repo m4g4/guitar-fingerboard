@@ -1,0 +1,37 @@
+.fret-string {
+    height: 28px;
+    padding-top: 4px;
+    box-sizing: border-box;
+}
+.fret-string.zero {
+}
+
+.fret-string:not(.zero) {
+    position: relative;
+    .string {
+        position: absolute;
+        bottom: 12px;
+        width: 100%;
+        border-bottom: 1px solid #000;
+        &.sizeTwo   { bottom: 11px; border-top: 1px solid #000; }
+        &.sizeThree { bottom: 10px; border-top: 1px solid #000; border-bottom-width: 2px; }
+        &.silver { border-bottom-color: #888888; }
+        &.copper { border-top-color: #A15B25; border-bottom-color: #8B341D; }
+    }
+}
+
+
+:host-context(.small-width) {
+    .fret-string {
+        height: 20px;
+        padding-top: 2px;
+    }
+
+    .fret-string:not(.zero) {
+        .string {
+            bottom: 10px;
+            &.sizeTwo   { bottom: 9px; border-bottom-width: 1px; }
+            &.sizeThree { bottom: 8px; border-bottom-width: 2px; }
+        }
+    }
+}
