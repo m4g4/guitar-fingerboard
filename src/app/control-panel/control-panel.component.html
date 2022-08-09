@@ -1,0 +1,29 @@
+<div class="control-panel">
+    <div class="left">
+        <button (click)="onMuteClick()">
+            <i-feather *ngIf="!isMuted()" name="volume-2" class="control-icon"></i-feather>
+            <i-feather *ngIf="isMuted()" name="volume-x" class="control-icon"></i-feather>
+        </button>
+    </div>
+    <div class="middle">
+        <button (click)="onMoveToBeginningClick()" [disabled]="isPlaying() || isAtTheBeginning()">
+            <i-feather name="rewind" class="control-icon"></i-feather>
+        </button>
+        <button (click)="onPreviousClick()" [disabled]="isPlaying()">
+            <i-feather name="skip-back" class="control-icon"></i-feather>
+        </button>
+        <button (click)="onPlayPauseClick()">
+            <i-feather *ngIf="!isPlaying()" name="play" class="control-icon"></i-feather>
+            <i-feather *ngIf="isPlaying()" name="pause" class="control-icon"></i-feather>
+        </button>
+        <button (click)="onNextClick()" [disabled]="isPlaying()">
+            <i-feather name="skip-forward" class="control-icon"></i-feather>
+        </button>
+    </div>
+    <div class="right">
+        <div class="tempo-slider">
+            <span class="tempo-label">Tempo:</span>
+            <ngx-slider [(value)]="tempo" (userChange)="tempoChanged()" [options]="createTempoSliderOptions()"></ngx-slider>
+        </div>
+    </div>
+</div>

@@ -1,9 +1,9 @@
-<div [ngClass]="['fret-string', isZeroFret ? 'zero' : '']">
+<div [ngClass]="['fret-string', fretNumber === 0 ? 'zero' : '']">
     <div class="string" [ngClass]=[stringLook]>
     </div>
     <app-tone
-        [toneName]="displayData.show"
-        [visible]="displayData.visible"
-        [tooltip]="displayData.tooltip"
+        [toneId]="toneId"
+        [toneName]="toneName"
+        [tonePitch]="tonePitch"
     ></app-tone>
 </div>

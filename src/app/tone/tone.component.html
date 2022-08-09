@@ -1,6 +1,4 @@
-<div [ngClass]="['tone', visible ? 'visible' : '']"
-     (mouseover)="mouseOver()"
-     (mouseout)="mouseOut()">
-    {{toneDisplayedString}}
+<div [ngClass]="['tone', pressed ? 'pressed' : '']" (click)="mouseClick()">
+    {{customName || toneName}}
     <div *ngIf="tooltip" class="tooltip">{{tooltip}}</div>
 </div>

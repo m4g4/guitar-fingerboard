@@ -1,22 +1,22 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { now } from 'tone';
+import GuitarAcousticMp3 from 'tonejs-instrument-guitar-acoustic-mp3';
 
-export type ToneIdType = string;
-
-export interface DiplayTone {
-    show?: null | string,
-    tooltip?: null | string
-}
-
-export interface Sequence {
-    displayTones: {[key: ToneIdType]: DiplayTone | string},
-    displayTimeMs: number
-}
+import { Utils } from './utils';
 
 export class GuitarTonesService {
 
-    private displayTones$ = new BehaviorSubject<{[key: ToneIdType]: DiplayTone | string}>({});
+    private instrumentMp3Player: any;
+    private instrumentMp3PlayerLoaded: boolean = false;
+    private debouncePlay: Function;
 
-    private _CONSTANTS = {
+    constructor() {
+        const self = this;
+        this.debouncePlay = Utils.debounce(
+            (tonePitch: string, strumDown: boolean) => { self.playTones(tonePitch, strumDown); },
+            100, true);
+    }
+
+    public CONSTANTS = {
         WORLD: {
             TONE_SHARPS: ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"],
             TONE_FLATS:  ["A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab"]
@@ -29,83 +29,111 @@ export class GuitarTonesService {
         KEYS_SHARP: ["C", "G", "D", "A", "E", "B", "F#"],
         KEYS_FLAT:  ["F", "Bb", "Eb", "Ab", "Db"],
 
-        GUITAR_ZERO_FRET_TONES: ["E", "B", "G", "D", "A", "E"]
+        ZERO_FRET_TONES: ["E", "B", "G", "D", "A", "E"],
+        ZERO_FRET_OCTAVES: [4, 3, 3, 3, 2, 2]
     }
 
-    animate(sequences: Sequence[], animateIndex: number) {
-        if (sequences.length === 0)
-        return;
-        if (animateIndex === sequences.length)
-        animateIndex = 0;
-
-        const sequence: Sequence = sequences[animateIndex];
-
-        this.animateStep(sequence, () => {
-            this.animate(sequences, animateIndex + 1);
-        });
+    generateToneId(fretNumber: number, stringNumber: number, toneName: string) {
+        return toneName + ":" + stringNumber  + ":" + fretNumber;
     }
 
-    animateStep(sequence: Sequence, finished: () => void) {
-        this.displayTones$.next(sequence.displayTones);
-        setTimeout(() => {
-            finished();
-        }, sequence.displayTimeMs);
+    getToneDataFromId(toneId: string) {
+        const data = toneId.split(':');
+        return { toneName: data[0], stringNumber: parseInt(data[1]), fretNumber: parseInt(data[2]) };
     }
 
-    createToneSequences(tonesInOrder: {[key: ToneIdType]: DiplayTone | string}[], stepTimeMs: number): Sequence[] {
-        return tonesInOrder
-        .map(tones => {
-            return {
-                displayTones: tones,
-                displayTimeMs: stepTimeMs
-            }
-        });
+    getTonesByKey(key: string) {
+        let tones: string[] = this.CONSTANTS.WORLD.TONE_SHARPS;
+
+        if (this.CONSTANTS.KEYS_SHARP.indexOf(key) === -1)
+            tones = this.CONSTANTS.WORLD.TONE_FLATS;
+
+        return tones;
     }
 
-    createSimpleToneSequences(tones: ToneIdType[], stepTimeMs: number, show?: string[] | null, tooltips?: string[] | null): Sequence[] {
-        if (show && show.length != tones.length) {
-            console.error("show array not of the same length as tones");
-            return [];
-        }
-
-        if (tooltips && tooltips.length != tones.length) {
-            console.error("tooltips array not of the same length as tones");
-            return [];
-        }
-
-        return this.createToneSequences(tones.map((tone, index) => {
-            return {
-                [tone]: {
-                    show: show ? show[index] : null,
-                    tooltip: tooltips ? tooltips[index] : null
-                }
-            }
-        }), stepTimeMs);
-    }
-
-    getDisplayTones(): Observable<{[key: ToneIdType]: DiplayTone | string}> {
-        return this.displayTones$;
-    }
-
-    generateToneId(stringNumber: number, toneName: string) {
-        return toneName + "[" + stringNumber  + "]";
-    }
-
-    getTone(fretNumber: number, stringZeroTone: string, key?: string) {
-
-        let tones: string[] = this._CONSTANTS.WORLD.TONE_SHARPS;
+    getTone(fretNumber: number, stringNumber: number, key?: string) {
 
         const keyName = key ? key : "C";
-        if (this._CONSTANTS.KEYS_SHARP.indexOf(keyName) === -1)
-        tones = this._CONSTANTS.WORLD.TONE_FLATS;
+        const tones = this.getTonesByKey(keyName);
 
+        const stringZeroTone = this.CONSTANTS.ZERO_FRET_TONES[stringNumber-1];
         const fretIndex = tones.indexOf(stringZeroTone);
         if (-1 === fretIndex) {
-            console.error("Invalid zero tone " + stringZeroTone);
+            throw new Error("Invalid zero tone " + stringZeroTone);
             return "";
         }
 
         const toneIndex = (fretIndex + fretNumber) % tones.length;
         return tones[toneIndex];
+    }
+
+    getFretNumberOfTone(stringNumber: number, toneName: string, key?: string): number {
+        const keyName = key ? key : "C";
+        const tones = this.getTonesByKey(keyName);
+
+        const stringZeroTone = this.CONSTANTS.ZERO_FRET_TONES[stringNumber-1];
+        const zeroToneIndex = tones.indexOf(stringZeroTone);
+
+        const toneIndex = tones.indexOf(toneName);
+        const fretNumber = toneIndex - zeroToneIndex;
+        return fretNumber >= 0 ? fretNumber : 12 + fretNumber;
+    }
+
+    getTonePitch(fretNumber: number, stringNumber: number) {
+
+        const toneName = this.getTone(fretNumber, stringNumber);
+        const fretNumberOfC = this.getFretNumberOfTone(stringNumber, "C");
+
+        const octave = this.CONSTANTS.ZERO_FRET_OCTAVES[stringNumber-1] +
+            (fretNumber % 12 < fretNumberOfC ? 0 : 1) +
+            (fretNumber >= 12 ? 1 : 0);
+
+        return toneName + octave;
+    }
+
+    playToneSound(tonePitch: string[] | string, strumDown: boolean = false) {
+
+        if (!this.instrumentMp3Player) {
+            this.instrumentMp3Player = new GuitarAcousticMp3({
+                onload: () => {
+                    this.instrumentMp3PlayerLoaded = true;
+                    this.debouncePlay(tonePitch, strumDown);
+                }
+            });
+            this.instrumentMp3Player.toDestination();
+        } else {
+            if (!this.instrumentMp3PlayerLoaded)
+                return;
+            this.debouncePlay(tonePitch, strumDown);
+        }
+    }
+
+    releaseToneSound(tonePitch: string[] | string) {
+        if (!Array.isArray(tonePitch)) {
+            this.instrumentMp3Player.triggerRelease(tonePitch, now());
+        } else {
+            tonePitch.forEach(p => {
+                this.instrumentMp3Player.triggerRelease(tonePitch, now());
+            });
+        }
+    }
+
+    releaseAllTones() {
+        this.instrumentMp3Player.releaseAll();
+    }
+
+    private playTones(pitches: string | string[], strumDown: boolean = false) {
+
+        if (!Array.isArray(pitches)) {
+            this.instrumentMp3Player.triggerAttack(pitches);
+        } else {
+            const nowValue = now();
+            let delay = 0;
+            pitches.forEach(p => {
+                this.instrumentMp3Player.triggerAttack(p, nowValue + delay);
+                if (strumDown)
+                    delay += 0.5;
+            });
+        }
     }
 }

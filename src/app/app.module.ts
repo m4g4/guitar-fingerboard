@@ -1,12 +1,15 @@
 import { NgModule, Injector, DoBootstrap, ApplicationRef, isDevMode } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { BrowserModule } from '@angular/platform-browser';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 import { AppComponent } from './app.component';
+import { IconsModule } from './icons/icons.module';
 import { FingerboardComponent } from './fingerboard/fingerboard.component';
 import { FretComponent } from './fret/fret.component';
 import { ToneComponent } from './tone/tone.component';
 import { FretStringComponent } from './fret-string/fret-string.component';
+import { ControlPanelComponent } from './control-panel/control-panel.component';
 
 @NgModule({
     declarations: [
@@ -14,10 +17,13 @@ import { FretStringComponent } from './fret-string/fret-string.component';
         FingerboardComponent,
         FretComponent,
         ToneComponent,
-        FretStringComponent
+        FretStringComponent,
+        ControlPanelComponent
     ],
     imports: [
-        BrowserModule
+        BrowserModule,
+        NgxSliderModule,
+        IconsModule,
     ],
     providers: [],
     bootstrap: [],

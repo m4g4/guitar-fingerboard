@@ -1,31 +1,47 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Observable } from 'rxjs';
+
+import { SequencerService, SequenceEvent, DisplayTone } from '../sequencer.service'
+import { GuitarTonesService } from '../guitar-tones.service'
 
 @Component({
   selector: 'app-tone',
   templateUrl: './tone.component.html',
   styleUrls: ['./tone.component.scss']
 })
-export class ToneComponent implements OnChanges {
+export class ToneComponent {
+    @Input() toneId: string = "";
     @Input() toneName: string = "";
-    @Input() tooltip?: string | null = null;
-    @Input() visible: boolean = false;
-    toneDisplayedString: string = " ";
+    @Input() tonePitch: string = "";
+    tooltip?: string | null = null;
+    pressed: boolean = false;
+    customName: null | string = null;
 
-    ngOnChanges() {
-        this.toneDisplayedString = this.visible ? this.toneName : "";
+    constructor(private guitarTonesService: GuitarTonesService,
+        private sequencerService: SequencerService) {
+
+        const self = this;
+        sequencerService.getDisplayTonesObservable().subscribe({
+            next(sequenceEvent: SequenceEvent) {
+                const displayedValue: null | DisplayTone | string = sequenceEvent[self.toneId];
+
+                if (displayedValue) {
+                    if (typeof displayedValue === "string") {
+                        self.customName = displayedValue;
+                    } else if (typeof displayedValue === "object") {
+                        self.customName = displayedValue.customName ? displayedValue.customName : "";
+                        self.tooltip = displayedValue.tooltip;
+                    }
+
+                    self.pressed = true;
+                } else {
+                    self.pressed = false;
+                }
+            }
+        });
     }
 
-    mouseOver() {
-        if (this.visible)
-            return;
-
-        this.toneDisplayedString = this.toneName;
-    }
-
-    mouseOut() {
-        if (this.visible)
-            return;
-
-        this.toneDisplayedString = " ";
+    mouseClick() {
+        this.guitarTonesService.playToneSound(this.tonePitch);
     }
 }

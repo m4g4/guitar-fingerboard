@@ -1,11 +1,7 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnChanges, Input } from '@angular/core';
 
-export interface ToneDisplayData {
-    toneId: string,
-    show: string,
-    tooltip?: null | string,
-    visible: boolean
-}
+import { DisplayTone } from '../sequencer.service'
+import { GuitarTonesService } from '../guitar-tones.service'
 
 @Component({
     selector: 'app-fret-string',
@@ -13,7 +9,24 @@ export interface ToneDisplayData {
     styleUrls: ['./fret-string.component.scss']
 })
 export class FretStringComponent {
-    @Input() isZeroFret: boolean = true;
     @Input() stringLook: string = "sizeOne silver";
-    @Input() displayData: ToneDisplayData = {toneId: "", show: "", visible: false};
+    @Input() fretNumber: number = -1;
+    @Input() stringNumber: string | number = -1;
+
+    toneId: string = "";
+    toneName: string = "";
+    tonePitch: string = "";
+
+    constructor(private guitarTonesService: GuitarTonesService) {}
+
+    ngOnChanges() {
+        //if (this.fretNumber === -1)
+        //    return;
+        if (typeof this.stringNumber === 'string')
+            this.stringNumber = parseInt(this.stringNumber);
+
+        this.toneName = this.guitarTonesService.getTone(this.fretNumber, this.stringNumber, "C");
+        this.toneId = this.guitarTonesService.generateToneId(this.fretNumber, this.stringNumber, this.toneName);
+        this.tonePitch = this.guitarTonesService.getTonePitch(this.fretNumber, this.stringNumber);
+    }
 }

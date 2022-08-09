@@ -1,32 +1,32 @@
 <div [ngClass]="['fret', fretNumber === 0 ? 'zero' : '']">
   <app-fret-string
-    [isZeroFret]="fretNumber === 0"
-    [displayData]="displayData(1, 'E')"
+    [fretNumber]="fretNumber"
+    stringNumber="1"
     stringLook="sizeOne silver">
   </app-fret-string>
   <app-fret-string
-    [isZeroFret]="fretNumber === 0"
-    [displayData]="displayData(2, 'B')"
+    [fretNumber]="fretNumber"
+    stringNumber="2"
     stringLook="sizeOne silver">
   </app-fret-string>
   <app-fret-string
-    [isZeroFret]="fretNumber === 0"
-    [displayData]="displayData(3, 'G')"
+    [fretNumber]="fretNumber"
+    stringNumber="3"
     stringLook="sizeOne copper">
   </app-fret-string>
   <app-fret-string
-    [isZeroFret]="fretNumber === 0"
-    [displayData]="displayData(4, 'D')"
+    [fretNumber]="fretNumber"
+    stringNumber="4"
     stringLook="sizeTwo copper">
   </app-fret-string>
   <app-fret-string
-    [isZeroFret]="fretNumber === 0"
-    [displayData]="displayData(5, 'A')"
+    [fretNumber]="fretNumber"
+    stringNumber="5"
     stringLook="sizeTwo copper">
   </app-fret-string>
   <app-fret-string
-    [isZeroFret]="fretNumber === 0"
-    [displayData]="displayData(6, 'E')"
+    [fretNumber]="fretNumber"
+    stringNumber="6"
     stringLook="sizeThree copper">
   </app-fret-string>
 

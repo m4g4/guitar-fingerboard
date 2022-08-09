@@ -1,5 +1,5 @@
 <div class="fingerboard">
     <div *ngFor="let fret of frets; let i=index" [ngClass]="[getFretClass(i)]">
-        <app-fret [fretNumber]="i" [displayedTones]="displayedTones$ | async"></app-fret>
+        <app-fret [fretNumber]="i"></app-fret>
     </div>
 </div>

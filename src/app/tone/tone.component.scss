@@ -16,8 +16,16 @@
     opacity: 0.05;
     cursor: default;
 
-    &.visible {
+    &.pressed {
         opacity: 1;
+    }
+
+    .tone-name {
+
+    }
+
+    .show-value {
+
     }
 
     .tooltip {
