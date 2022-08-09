@@ -1,12 +1,13 @@
 'use strict';
 
-import gulp from 'gulp';
-import data from 'gulp-data';
-import concat from 'gulp-concat';
-import replace from 'gulp-replace';
+const gulp = require('gulp');
+const data = require('gulp-data');
+const concat = require('gulp-concat');
+const replace = require('gulp-replace');
 
 let version = '';
 let app_name = ''
+
 const DIST_DIR = 'dist/guitar-fingerboard';
 
 gulp.task('read_app_meta', function() {
