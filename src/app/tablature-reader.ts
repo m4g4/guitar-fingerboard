@@ -31,6 +31,7 @@ export class TablatureReader {
 
         const result: SequenceEvent[] = [];
 
+        let lastEvent: SequenceEvent = {0:{}};
         let currentIndex = 0;
 
         while (true) {
@@ -70,8 +71,14 @@ export class TablatureReader {
             if (!processed)
                 break;
 
-            if (addEvent)
-                result.push(event);
+            if (addEvent) {
+                // if the event is empty (no notes playing), and the next is not empty, skip to the next one
+                if (Object.keys(event).length != 0 || Object.keys(lastEvent).length == 0) {
+                    result.push(event);
+                }
+
+                lastEvent = event;
+            }
             currentIndex++;
         }
 

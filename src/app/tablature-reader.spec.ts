@@ -15,8 +15,20 @@ describe('TablatureReader', () => {
     });
 
     it('should parse tablature', () => {
+        const data: string = "|3-3|\n|---|\n|---|\n|---|\n|---|\n|---|";
+        const result = TablatureReader.read(gts, data);
+        expect(JSON.stringify(result)).toEqual(JSON.stringify([{"G:1:3": {}}, {"G:1:3": {}}]));
+    });
+
+    it('should skip one pause symbol \'-\'', () => {
         const data: string = "|-3-|\n|---|\n|---|\n|---|\n|---|\n|---|";
         const result = TablatureReader.read(gts, data);
-        expect(JSON.stringify(result)).toEqual(JSON.stringify([{}, {"G:1:3": {}}, {}]));
+        expect(JSON.stringify(result)).toEqual(JSON.stringify([{"G:1:3": {}}]));
+    });
+
+    it('should not skip one pause symbol \'-\'', () => {
+        const data: string = "|3--3|\n|----|\n|----|\n|----|\n|----|\n|----|";
+        const result = TablatureReader.read(gts, data);
+        expect(JSON.stringify(result)).toEqual(JSON.stringify([{"G:1:3": {}}, {}, {"G:1:3": {}}]));
     });
 });

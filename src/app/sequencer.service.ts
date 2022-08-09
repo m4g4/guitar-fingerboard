@@ -124,17 +124,6 @@ export class SequencerService {
         this.animationRunning = true;
 
         const event: SequenceEvent = this.sequence[this.sequenceIndex$.getValue()];
-
-        // if the event is empty (no notes playing), and the next is not empty, skip to the next one
-        /*if (Object.keys(event).length === 0) {
-            if (this.sequenceIndex$.getValue() + 1 < this.sequence.length) {
-                if (Object.keys(this.sequence[this.sequenceIndex$.getValue() + 1]).length != 0) {
-                    this.animationRunning = false;
-                    this.sequenceIndex$.next(this.sequenceIndex$.getValue() + 1);
-                    return;
-                }
-            }
-        }*/
         this.displayTones$.next(event);
 
         if (!this.playing$.getValue()) {
