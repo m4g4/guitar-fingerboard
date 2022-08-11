@@ -27,6 +27,6 @@ export class FretStringComponent {
 
         this.toneName = this.guitarTonesService.getTone(this.fretNumber, this.stringNumber, "C");
         this.toneId = this.guitarTonesService.generateToneId(this.fretNumber, this.stringNumber, this.toneName);
-        this.tonePitch = this.guitarTonesService.getTonePitch(this.fretNumber, this.stringNumber);
+        this.tonePitch = this.guitarTonesService.getWorldTonePitch(this.fretNumber, this.stringNumber);
     }
 }

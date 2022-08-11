@@ -3,6 +3,15 @@ import { Injectable } from '@angular/core';
 import { GuitarTonesService } from './guitar-tones.service';
 import { SequenceEvent } from './sequencer.service';
 
+enum State {
+    Unknown,
+    Bar,
+    Space,
+    Pause,
+    Tone2Indexes,
+    Tone,
+}
+
 export class TablatureReader {
 
     private static STRING_COUNT = 6;
@@ -17,7 +26,7 @@ export class TablatureReader {
         }
 
         const allowedCharactersToStart = ['|', '-']
-            .concat(guitarTonesService.CONSTANTS.ZERO_FRET_TONES);
+            .concat(guitarTonesService.getNomenclature().getZeroFretTones());
 
         const tabLines: string[] = lines.filter(line => {
             return line.length > 0
@@ -31,54 +40,110 @@ export class TablatureReader {
 
         const result: SequenceEvent[] = [];
 
-        let lastEvent: SequenceEvent = {0:{}};
+        let lastState: State = State.Unknown;
+        let currentState: State = State.Unknown;
         let currentIndex = 0;
 
         while (true) {
 
-            const event: SequenceEvent = {};
-
-            let processed = false;
-            let addEvent = false;
+            let finished = true;
             for ( let s = 0; s < this.STRING_COUNT; s++ ) {
+
                 if (currentIndex >= tabLines[s].length)
                     continue;
 
-                processed = true;
+                finished = false;
 
-                if (tabLines[s][currentIndex] === "|")
-                    continue;
+                if (tabLines[s][currentIndex] === "|") {
+                    currentState = State.Bar;
+                    break;
+                }
 
-                addEvent = true;
-
-                const num = parseInt(tabLines[s][currentIndex]);
-                if (!isNaN(num)) {
-                    let fretNumber = parseInt(tabLines[s][currentIndex]);
-
-                    if (currentIndex + 1 < tabLines[s].length) {
-                        const nextNum = parseInt(tabLines[s][currentIndex+1]);
-                        if (!isNaN(nextNum))
-                            fretNumber = parseInt(tabLines[s].substring(currentIndex, 2));
+                if (currentState === State.Unknown && tabLines[s][currentIndex] === "-") {
+                    if (lastState === State.Space) {
+                        currentState = State.Pause;
+                    } else {
+                        currentState = State.Space;
                     }
+                }
 
-                    const toneName = guitarTonesService.getTone(fretNumber, s + 1);
-                    const toneId = guitarTonesService.generateToneId(fretNumber, s + 1, toneName);
+                if (!isNaN(parseInt(tabLines[s][currentIndex]))) {
+                    currentState = State.Tone;
 
-                    event[toneId] = {};
+                    if (!isNaN(parseInt(tabLines[s][currentIndex + 1]))) {
+                        currentState = State.Tone2Indexes;
+                    }
                 }
             }
 
-            if (!processed)
+            if (finished)
                 break;
 
-            if (addEvent) {
-                // if the event is empty (no notes playing), and the next is not empty, skip to the next one
-                if (Object.keys(event).length != 0 || Object.keys(lastEvent).length == 0) {
-                    result.push(event);
-                }
+            let event: null | SequenceEvent = null;
 
-                lastEvent = event;
+            switch (currentState) {
+                case State.Bar:
+                    break;
+                case State.Space:
+                    break;
+                case State.Pause:
+                    event = {};
+                    break;
+                case State.Tone:
+                    event = {};
+
+                    for ( let s = 0; s < this.STRING_COUNT; s++ ) {
+                        if (currentIndex >= tabLines[s].length)
+                            continue;
+
+                        const num = parseInt(tabLines[s][currentIndex]);
+                        if (!isNaN(num)) {
+                            let fretNumber = parseInt(tabLines[s][currentIndex]);
+                            const toneName = guitarTonesService.getTone(fretNumber, s + 1);
+                            const toneId = guitarTonesService.generateToneId(fretNumber, s + 1, toneName);
+
+                            event[toneId] = {};
+                        }
+                    }
+                    break;
+                case State.Tone2Indexes:
+                    event = {};
+
+                    for ( let s = 0; s < this.STRING_COUNT; s++ ) {
+                        if (currentIndex >= tabLines[s].length)
+                            continue;
+
+                        let fretNumber: undefined | number;
+                        let num = parseInt(tabLines[s][currentIndex]);
+                        if (!isNaN(num) && !isNaN(parseInt(tabLines[s][currentIndex + 1]))) {
+                            fretNumber = parseInt(tabLines[s].substring(currentIndex, 2));
+                        } else {
+                            num = parseInt(tabLines[s][currentIndex + 1]);
+                            if (!isNaN(num)) {
+                                fretNumber = num;
+                            }
+                        }
+
+                        if (fretNumber) {
+                            const toneName = guitarTonesService.getTone(fretNumber, s + 1);
+                            const toneId = guitarTonesService.generateToneId(fretNumber, s + 1, toneName);
+
+                            event[toneId] = {};
+                        }
+                    }
+                    currentIndex++;
+                    break;
+
+                default:
+                    console.log("Unknown state", currentState);
             }
+
+            if (event) {
+                result.push(event);
+            }
+
+            lastState = currentState;
+            currentState = State.Unknown;
             currentIndex++;
         }
 

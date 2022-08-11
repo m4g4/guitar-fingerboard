@@ -22,7 +22,7 @@
     "@angular/router": "^14.0.0",
     "angular-feather": "^6.5.0",
     "rxjs": "~7.5.0",
-    "tonejs-instrument-guitar-acoustic-mp3": "^1.1.2",
+    "tone": "^14.7.77",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
   },

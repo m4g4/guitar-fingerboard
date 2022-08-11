@@ -3,7 +3,7 @@
     height: 24px;
     line-height: 20px;
     margin: 0 auto;
-    font-size: 0.8em;
+    font-size: 13px;
     text-align: center;
     padding: 2px;
     border-radius: 50%;
@@ -15,17 +15,10 @@
     z-index: 1;
     opacity: 0.05;
     cursor: default;
+    white-space: nowrap;
 
     &.pressed {
         opacity: 1;
-    }
-
-    .tone-name {
-
-    }
-
-    .show-value {
-
     }
 
     .tooltip {
@@ -52,7 +45,7 @@
     .tone {
         width: 16px;
         height: 16px;
-        font-size: 0.6em;
+        font-size: 9px;
         line-height: 14px;
         padding: 1px;
     }

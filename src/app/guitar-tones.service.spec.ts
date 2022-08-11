@@ -41,7 +41,7 @@ describe('GuitarTonesService', () => {
     });
 
     it('should return tone pitch C3', () => {
-        expect(service.getTonePitch(3, 5)).toEqual("C3");
+        expect(service.getWorldTonePitch(3, 5)).toEqual("C3");
     });
 
     it('should return a correct tone pitch', () => {
@@ -55,7 +55,7 @@ describe('GuitarTonesService', () => {
         ];
         for(let s = 6; s > 0; s--) {
             for (let f = 0; f < 12; f++) {
-                expect(service.getTonePitch(f, s)).toEqual(tonePitches[s-1][f]);
+                expect(service.getWorldTonePitch(f, s)).toEqual(tonePitches[s-1][f]);
             }
         }
     });

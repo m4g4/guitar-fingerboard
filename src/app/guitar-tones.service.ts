@@ -1,36 +1,70 @@
+import { Inject } from '@angular/core';
 import { now } from 'tone';
-import GuitarAcousticMp3 from 'tonejs-instrument-guitar-acoustic-mp3';
+import GuitarSampler from './guitar-sampler';
+
+import { RegionNomenclature } from './region/region-nomenclature';
+import { WorldNomenclature } from './region/world-nomenclature';
+import { MiddleEuropeNomenclature } from './region/middle-europe-nomenclature';
 
 import { Utils } from './utils';
+
+enum Region {
+    World,
+    MidEu
+}
+
+export interface InitializeOptions {
+    region: undefined | string;
+    static_mp3_folder: undefined | string;
+}
 
 export class GuitarTonesService {
 
     private instrumentMp3Player: any;
     private instrumentMp3PlayerLoaded: boolean = false;
+
     private debouncePlay: Function;
+
+    private nomenclature: RegionNomenclature;
+    private worldNomenclature: WorldNomenclature = new WorldNomenclature();
 
     constructor() {
         const self = this;
         this.debouncePlay = Utils.debounce(
             (tonePitch: string, strumDown: boolean) => { self.playTones(tonePitch, strumDown); },
             100, true);
+
+        this.nomenclature = new WorldNomenclature();
     }
 
-    public CONSTANTS = {
-        WORLD: {
-            TONE_SHARPS: ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"],
-            TONE_FLATS:  ["A", "Bb", "B", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab"]
-        },
-        MIDDLE_EUROPE: {
-            TONE_SHARPS: ["A", "B", "H", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"],
-            TONE_FLATS: ["A", "B", "H", "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab"]
-        },
+    initialize(options?: InitializeOptions) {
 
-        KEYS_SHARP: ["C", "G", "D", "A", "E", "B", "F#"],
-        KEYS_FLAT:  ["F", "Bb", "Eb", "Ab", "Db"],
+        this.instrumentMp3PlayerLoaded = false;
+        this.instrumentMp3Player = new GuitarSampler({
+            mp3s_url_prefix: options ? options.static_mp3_folder : undefined,
+            onload: () => {
+                this.instrumentMp3Player.toDestination();
+                this.instrumentMp3PlayerLoaded = true;
+            }
+        });
 
-        ZERO_FRET_TONES: ["E", "B", "G", "D", "A", "E"],
-        ZERO_FRET_OCTAVES: [4, 3, 3, 3, 2, 2]
+        if (options && options.region) {
+            const region: Region = Region[options.region as keyof typeof Region];
+            switch (region) {
+                case Region.MidEu:
+                    this.nomenclature = new MiddleEuropeNomenclature();
+                    break;
+                default:
+                    this.nomenclature = new WorldNomenclature();
+            }
+        } else {
+            console.log("Region has not been specified. Using World");
+            this.nomenclature = new WorldNomenclature();
+        }
+    }
+
+    getNomenclature(): RegionNomenclature {
+        return this.nomenclature;
     }
 
     generateToneId(fretNumber: number, stringNumber: number, toneName: string) {
@@ -42,21 +76,25 @@ export class GuitarTonesService {
         return { toneName: data[0], stringNumber: parseInt(data[1]), fretNumber: parseInt(data[2]) };
     }
 
-    getTonesByKey(key: string) {
-        let tones: string[] = this.CONSTANTS.WORLD.TONE_SHARPS;
+    getTonesByKey(key: string, nomenclature?: RegionNomenclature) {
+        nomenclature = nomenclature || this.nomenclature;
 
-        if (this.CONSTANTS.KEYS_SHARP.indexOf(key) === -1)
-            tones = this.CONSTANTS.WORLD.TONE_FLATS;
+        let tones: string[] = nomenclature.getMusicalAlphabetSharps();
+
+        if (nomenclature.getSharpKeys().indexOf(key) === -1)
+            tones = nomenclature.getMusicalAlphabetFlats();
 
         return tones;
     }
 
-    getTone(fretNumber: number, stringNumber: number, key?: string) {
+    getTone(fretNumber: number, stringNumber: number, key?: string, nomenclature?: RegionNomenclature) {
+
+        nomenclature = nomenclature || this.nomenclature;
 
         const keyName = key ? key : "C";
-        const tones = this.getTonesByKey(keyName);
+        const tones = this.getTonesByKey(keyName, nomenclature);
 
-        const stringZeroTone = this.CONSTANTS.ZERO_FRET_TONES[stringNumber-1];
+        const stringZeroTone = nomenclature.getZeroFretTones()[stringNumber-1];
         const fretIndex = tones.indexOf(stringZeroTone);
         if (-1 === fretIndex) {
             throw new Error("Invalid zero tone " + stringZeroTone);
@@ -71,7 +109,7 @@ export class GuitarTonesService {
         const keyName = key ? key : "C";
         const tones = this.getTonesByKey(keyName);
 
-        const stringZeroTone = this.CONSTANTS.ZERO_FRET_TONES[stringNumber-1];
+        const stringZeroTone = this.nomenclature.getZeroFretTones()[stringNumber-1];
         const zeroToneIndex = tones.indexOf(stringZeroTone);
 
         const toneIndex = tones.indexOf(toneName);
@@ -79,36 +117,35 @@ export class GuitarTonesService {
         return fretNumber >= 0 ? fretNumber : 12 + fretNumber;
     }
 
-    getTonePitch(fretNumber: number, stringNumber: number) {
+    getWorldTonePitch(fretNumber: number, stringNumber: number) {
 
-        const toneName = this.getTone(fretNumber, stringNumber);
+        const toneName = this.getTone(fretNumber, stringNumber, "C", this.worldNomenclature);
         const fretNumberOfC = this.getFretNumberOfTone(stringNumber, "C");
 
-        const octave = this.CONSTANTS.ZERO_FRET_OCTAVES[stringNumber-1] +
+        const octave = this.worldNomenclature.getFretToneOctaves()[stringNumber-1] +
             (fretNumber % 12 < fretNumberOfC ? 0 : 1) +
             (fretNumber >= 12 ? 1 : 0);
 
         return toneName + octave;
     }
 
+    isGuitarInstrumentInitialized() {
+        return this.instrumentMp3PlayerLoaded;
+    }
+
     playToneSound(tonePitch: string[] | string, strumDown: boolean = false) {
 
-        if (!this.instrumentMp3Player) {
-            this.instrumentMp3Player = new GuitarAcousticMp3({
-                onload: () => {
-                    this.instrumentMp3PlayerLoaded = true;
-                    this.debouncePlay(tonePitch, strumDown);
-                }
-            });
-            this.instrumentMp3Player.toDestination();
-        } else {
-            if (!this.instrumentMp3PlayerLoaded)
-                return;
-            this.debouncePlay(tonePitch, strumDown);
-        }
+        if (!this.instrumentMp3PlayerLoaded)
+            throw new Error("Instrument has not been initialized yet");
+
+        this.debouncePlay(tonePitch, strumDown);
     }
 
     releaseToneSound(tonePitch: string[] | string) {
+
+        if (!this.instrumentMp3PlayerLoaded)
+            throw new Error("Instrument has not been initialized yet");
+
         if (!Array.isArray(tonePitch)) {
             this.instrumentMp3Player.triggerRelease(tonePitch, now());
         } else {
@@ -119,6 +156,9 @@ export class GuitarTonesService {
     }
 
     releaseAllTones() {
+        if (!this.instrumentMp3PlayerLoaded)
+            throw new Error("Instrument has not been initialized yet");
+
         this.instrumentMp3Player.releaseAll();
     }
 

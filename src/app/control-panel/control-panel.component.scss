@@ -12,7 +12,8 @@
         margin: 0 5px;
         cursor: pointer;
         border-width: 0;
-        border-radius: 5%;
+        border-radius: 8%;
+        line-height: 22px;
 
         .control-icon {
             height: 22px !important; // :-(
@@ -25,7 +26,7 @@
     .tempo-slider {
         .tempo-label { color: #666; padding-right: 20px; }
         ngx-slider {
-            max-width: 200px;
+            max-width: 160px;
             .ngx-slider-pointer {
                 width: 20px;
                 height: 20px;
@@ -56,6 +57,7 @@
 :host-context(.small-width) {
     button {
         padding: 5px 7px 2px 7px;
+        line-height: 16px;
 
         .control-icon {
             height: 16px !important; // :-(
