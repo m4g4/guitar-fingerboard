@@ -124,7 +124,7 @@ export class AppComponent implements AfterViewInit, OnInit {
 
     checkIfSmallScreen() {
         if (this.root) {
-            this.smallScreen = this.root.nativeElement.offsetWidth < 768;
+            this.smallScreen = this.root.nativeElement.offsetWidth < 750;
         }
     }
 }
