@@ -126,8 +126,6 @@ export class AppComponent implements AfterViewInit, OnInit {
             return;
         }
 
-        console.log('Data', data);
-
         this.sequencerService.setSequence(data);
     }
 
