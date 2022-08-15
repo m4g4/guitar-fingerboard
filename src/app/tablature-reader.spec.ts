@@ -31,4 +31,10 @@ describe('TablatureReader', () => {
         const result = TablatureReader.read(gts, data);
         expect(JSON.stringify(result)).toEqual(JSON.stringify([{"G:1:3": {}}, {}, {"G:1:3": {}}]));
     });
+
+    it('should parse tablature using ; as new lines', () => {
+        const data: string = "|3-3|;|---|;|---|;|---|;|---|;|---|";
+        const result = TablatureReader.read(gts, data);
+        expect(JSON.stringify(result)).toEqual(JSON.stringify([{"G:1:3": {}}, {"G:1:3": {}}]));
+    });
 });

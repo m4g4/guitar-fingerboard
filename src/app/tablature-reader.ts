@@ -19,7 +19,12 @@ export class TablatureReader {
     constructor() {}
 
     static read(guitarTonesService: GuitarTonesService, data: string): SequenceEvent[] {
-        const lines: string[] = data.split('\n');
+        let lines: string[] = data.split('\n');
+
+        lines = lines.reduce(
+            (acc: string[], line: string) => [...acc, ...line.split(';')],
+            []
+        );
 
         if (lines.length < this.STRING_COUNT) {
             throw new Error("Cannot parse tablature. At least 6 rows is required, got " + lines.length);
