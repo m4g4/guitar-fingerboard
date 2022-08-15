@@ -22,7 +22,7 @@ export class TablatureReader {
         const lines: string[] = data.split('\n');
 
         if (lines.length < this.STRING_COUNT) {
-            throw new Error("Cannot parse tablature. At least 6 rows is required.")
+            throw new Error("Cannot parse tablature. At least 6 rows is required, got " + lines.length);
         }
 
         const allowedCharactersToStart = ['|', '-']

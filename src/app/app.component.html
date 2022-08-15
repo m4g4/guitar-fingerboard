@@ -1,4 +1,5 @@
 <div #root [ngClass]="['root', smallScreen ? 'small-width' : '']">
     <app-fingerboard></app-fingerboard>
     <app-control-panel></app-control-panel>
+    <div *ngIf="errorMessage" class="error-panel"><div class="vertical-center">{{errorMessage}}</div></div>
 </div>

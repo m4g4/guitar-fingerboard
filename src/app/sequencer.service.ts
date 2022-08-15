@@ -121,6 +121,9 @@ export class SequencerService {
         if (this.animationRunning)
             return;
 
+        if (this.sequence.length === 0)
+            return;
+
         this.animationRunning = true;
 
         const event: SequenceEvent = this.sequence[this.sequenceIndex$.getValue()];
