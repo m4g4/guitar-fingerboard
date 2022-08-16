@@ -39,16 +39,20 @@ export class ControlPanelComponent {
         this.sequencerService.goToBeginning();
     }
 
-    isAtTheBeginning() {
-        return this.sequencerService.isAtTheBeginning();
-    }
-
     onMuteClick() {
         this.sequencerService.toggleMuted();
     }
 
     isMuted() {
         return this.sequencerService.isMuted();
+    }
+
+    onRepeatClick() {
+        this.sequencerService.toggleRepeat();
+    }
+
+    isRepeat() {
+        return this.sequencerService.isRepeat();
     }
 
     tempoChanged() {
@@ -59,4 +63,11 @@ export class ControlPanelComponent {
         return this.sequencerService.isPlaying();
     }
 
+    isAtTheBeginning() {
+        return this.sequencerService.isAtTheBeginning();
+    }
+
+    isAtTheEnd() {
+        return this.sequencerService.isAtTheEnd();
+    }
 }

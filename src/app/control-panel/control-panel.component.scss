@@ -15,6 +15,10 @@
         border-radius: 8%;
         line-height: 22px;
 
+        &.toggle-pressed {
+            box-shadow: inset 0px 0px 10px #a1a1a1;
+        }
+
         .control-icon {
             height: 22px !important; // :-(
             width: 22px !important;

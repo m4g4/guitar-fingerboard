@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 
 import { FeatherModule } from 'angular-feather';
-import { Play, Pause, SkipForward, SkipBack, Rewind, Volume2, VolumeX } from 'angular-feather/icons';
+import { Play, Pause, SkipForward, SkipBack, Rewind, Repeat, VolumeX } from 'angular-feather/icons';
 
 // Select some icons (use an object, not an array)
 const icons = {
@@ -11,7 +11,7 @@ const icons = {
     SkipBack,
     Rewind,
     VolumeX,
-    Volume2
+    Repeat
 };
 
 @NgModule({

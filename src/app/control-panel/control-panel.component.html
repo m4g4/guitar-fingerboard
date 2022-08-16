@@ -1,5 +1,11 @@
 <div class="control-panel">
     <div class="left">
+        <button (click)="onMuteClick()" [ngClass]="[isMuted() ? 'toggle-pressed' : '']">
+            <i-feather name="volume-x" class="control-icon"></i-feather>
+        </button>
+        <button (click)="onRepeatClick()" [ngClass]="[isRepeat() ? 'toggle-pressed' : '']">
+            <i-feather name="repeat" class="control-icon"></i-feather>
+        </button>
     </div>
     <div class="middle">
         <button (click)="onMoveToBeginningClick()" [disabled]="isPlaying() || isAtTheBeginning()">
@@ -14,10 +20,6 @@
         </button>
         <button (click)="onNextClick()" [disabled]="isPlaying()">
             <i-feather name="skip-forward" class="control-icon"></i-feather>
-        </button>
-        <button (click)="onMuteClick()">
-            <i-feather *ngIf="!isMuted()" name="volume-x" class="control-icon"></i-feather>
-            <i-feather *ngIf="isMuted()" name="volume-2" class="control-icon"></i-feather>
         </button>
     </div>
     <div class="right">

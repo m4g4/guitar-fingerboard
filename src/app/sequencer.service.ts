@@ -14,6 +14,7 @@ export class SequencerService {
     SEQUENCE_BEAT_DEFAULT = 1000;
 
     private muted$ = new BehaviorSubject<boolean>(false);
+    private repeat$ = new BehaviorSubject<boolean>(false);
 
     private playing$ = new BehaviorSubject<boolean>(false);
     private sequenceBeatMs$ = new BehaviorSubject<number>(this.SEQUENCE_BEAT_DEFAULT);
@@ -54,6 +55,9 @@ export class SequencerService {
 
     togglePlaying() {
         this.playing$.next(!this.playing$.getValue());
+        if (this.sequenceIndex$.getValue() === -1) {
+            this.sequenceIndex$.next(0);
+        }
     }
 
     isPlaying() {
@@ -68,14 +72,26 @@ export class SequencerService {
         return this.muted$.getValue();
     }
 
+    toggleRepeat() {
+        this.repeat$.next(!this.repeat$.getValue());
+    }
+
+    isRepeat() {
+        return this.repeat$.getValue();
+    }
+
     goToBeginning() {
         if (this.playing$.getValue())
             return;
-        this.sequenceIndex$.next(0);
+        this.sequenceIndex$.next(-1);
     }
 
     isAtTheBeginning() {
-        return this.sequenceIndex$.getValue() === 0;
+        return this.sequenceIndex$.getValue() === -1;
+    }
+
+    isAtTheEnd() {
+        return this.sequenceIndex$.getValue() === this.sequence.length - 1;
     }
 
     setPreviousStep() {
@@ -93,7 +109,7 @@ export class SequencerService {
             return;
 
         let index = this.sequenceIndex$.getValue();
-        if (/* TODO REPEAT */index === this.sequence.length - 1) {
+        if (this.repeat$.getValue() && index === this.sequence.length - 1) {
             index = 0;
         }
 
@@ -108,7 +124,7 @@ export class SequencerService {
         if (this.sequenceIndexSubscription) {
             this.sequenceIndexSubscription.unsubscribe();
         }
-        this.sequenceIndex$.next(0);
+        this.sequenceIndex$.next(-1);
 
         const self = this;
         this.sequenceIndexSubscription = this.sequenceIndex$.subscribe({
@@ -123,6 +139,10 @@ export class SequencerService {
 
         if (this.sequence.length === 0)
             return;
+
+        if (this.sequenceIndex$.getValue() === -1) {
+            return;
+        }
 
         this.animationRunning = true;
 
@@ -140,12 +160,18 @@ export class SequencerService {
 
             let index = self.sequenceIndex$.getValue() + 1;
 
-            if (/* TODO REPEAT */index === self.sequence.length) {
+            if (self.repeat$.getValue() && index === self.sequence.length) {
                 index = 0;
             }
 
-            if (index < self.sequence.length && self.playing$.getValue())
-                self.sequenceIndex$.next(index);
+            if (self.playing$.getValue()) {
+                if (index < self.sequence.length)
+                    self.sequenceIndex$.next(index);
+                else {
+                    self.playing$.next(false);
+                    this.sequenceIndex$.next(-1);
+                }
+            }
 
         }, this.sequenceBeatMs$.getValue());
     }
