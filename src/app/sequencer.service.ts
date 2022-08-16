@@ -87,7 +87,7 @@ export class SequencerService {
     }
 
     isAtTheBeginning() {
-        return this.sequenceIndex$.getValue() === -1;
+        return this.sequenceIndex$.getValue() === -1 || this.sequenceIndex$.getValue() === 0;
     }
 
     isAtTheEnd() {
@@ -141,6 +141,7 @@ export class SequencerService {
             return;
 
         if (this.sequenceIndex$.getValue() === -1) {
+            this.displayTones$.next({});
             return;
         }
 

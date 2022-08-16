@@ -11,14 +11,14 @@
         <button (click)="onMoveToBeginningClick()" [disabled]="isPlaying() || isAtTheBeginning()">
             <i-feather name="rewind" class="control-icon"></i-feather>
         </button>
-        <button (click)="onPreviousClick()" [disabled]="isPlaying()">
+        <button (click)="onPreviousClick()" [disabled]="isPlaying() || isAtTheBeginning()">
             <i-feather name="skip-back" class="control-icon"></i-feather>
         </button>
         <button (click)="onPlayPauseClick()">
             <i-feather *ngIf="!isPlaying()" name="play" class="control-icon"></i-feather>
             <i-feather *ngIf="isPlaying()" name="pause" class="control-icon"></i-feather>
         </button>
-        <button (click)="onNextClick()" [disabled]="isPlaying()">
+        <button (click)="onNextClick()" [disabled]="isPlaying() || isAtTheEnd()">
             <i-feather name="skip-forward" class="control-icon"></i-feather>
         </button>
     </div>
