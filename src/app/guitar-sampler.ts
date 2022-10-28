@@ -121,11 +121,6 @@ function toSamplerMap(url_prefix: string) {
     }
 }
 
- interface SamplesMap {
-  	[note: string]: string;
-  	[midi: number]: string;
- }
-
 interface Options {
     mp3s_url_prefix?: undefined | string,
     onload?: () => void

@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { SequenceEvent } from '../sequencer.service'
 
 @Component({
     selector: 'app-fret',

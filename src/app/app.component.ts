@@ -1,6 +1,6 @@
 import { Component, ViewChild, AfterViewInit, ElementRef, Input, OnInit } from '@angular/core';
 import { Observable, fromEvent } from 'rxjs';
-import { map, filter, debounceTime, tap, switchAll } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 
 import { SequencerService, SequenceEvent, ToneIdType, DisplayTone } from './sequencer.service';
 import { TablatureReader } from './tablature-reader';

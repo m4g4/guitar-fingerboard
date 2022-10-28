@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { Observable } from 'rxjs';
 
 import { SequencerService, SequenceEvent, DisplayTone } from '../sequencer.service'
 import { GuitarTonesService } from '../guitar-tones.service'

@@ -1,6 +1,5 @@
-import { Component, OnChanges, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
-import { DisplayTone } from '../sequencer.service'
 import { GuitarTonesService } from '../guitar-tones.service'
 
 @Component({

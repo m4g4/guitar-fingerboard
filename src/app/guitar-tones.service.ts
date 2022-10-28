@@ -1,4 +1,3 @@
-import { Inject } from '@angular/core';
 import { now } from 'tone';
 import GuitarSampler from './guitar-sampler';
 
@@ -98,7 +97,6 @@ export class GuitarTonesService {
         const fretIndex = tones.indexOf(stringZeroTone);
         if (-1 === fretIndex) {
             throw new Error("Invalid zero tone " + stringZeroTone);
-            return "";
         }
 
         const toneIndex = (fretIndex + fretNumber) % tones.length;
@@ -150,7 +148,7 @@ export class GuitarTonesService {
             this.instrumentMp3Player.triggerRelease(tonePitch, now());
         } else {
             tonePitch.forEach(p => {
-                this.instrumentMp3Player.triggerRelease(tonePitch, now());
+                this.instrumentMp3Player.triggerRelease(p, now());
             });
         }
     }

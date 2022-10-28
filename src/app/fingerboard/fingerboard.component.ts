@@ -1,6 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { SequenceEvent, DisplayTone } from '../sequencer.service';
-import { GuitarTonesService } from '../guitar-tones.service';
 
 @Component({
     selector: 'app-fingerboard',

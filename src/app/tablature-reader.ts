@@ -1,4 +1,3 @@
-import { Injectable } from '@angular/core';
 
 import { GuitarTonesService } from './guitar-tones.service';
 import { SequenceEvent } from './sequencer.service';
